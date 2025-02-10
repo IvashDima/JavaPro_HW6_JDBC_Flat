@@ -29,7 +29,48 @@ public class Main {
                             viewAllFlats();
                             break;
                         case "3":
-                            FindFlatsByParam(scanner);
+                            System.out.println("Select a parameter to search by:");
+                            System.out.println("1 - id, 2 - district, 3 - address, 4 - roomNum, 5 - square, 6 - price.");
+                            System.out.print("Your choice: ");
+                            String ss = scanner.nextLine();
+                            switch (ss) {
+                                case "1":
+                                    System.out.print("Enter id: ");
+                                    String sid = scanner.nextLine();
+                                    int id = Integer.parseInt(sid);
+                                    FindFlatsById(id);
+                                    break;
+                                case "2":
+                                    System.out.print("Enter district: ");
+                                    String district = scanner.nextLine();
+                                    FindFlatsByDistrict(district);
+                                    break;
+                                case "3":
+                                    System.out.print("Enter address: ");
+                                    String address = scanner.nextLine();
+                                    FindFlatsByAddress(address);
+                                    break;
+                                case "4":
+                                    System.out.print("Enter number of rooms: ");
+                                    String sroomNum = scanner.nextLine();
+                                    int roomNum = Integer.parseInt(sroomNum);
+                                    FindFlatsByRoom(roomNum);
+                                    break;
+                                case "5":
+                                    System.out.print("Enter square: ");
+                                    String ssquare = scanner.nextLine();
+                                    float square = Float.parseFloat(ssquare);
+                                    FindFlatsBySquare(square);
+                                    break;
+                                case "6":
+                                    System.out.print("Enter price: ");
+                                    String sprice = scanner.nextLine();
+                                    int price = Integer.parseInt(sprice);
+                                    FindFlatsByPrice(price);
+                                    break;
+                                default:
+                                    return;
+                            }
                             break;
                         default:
                             return;
@@ -114,55 +155,37 @@ public class Main {
             ps.close();
         }
     }
-    private static void FindFlatsByParam(Scanner scanner) throws SQLException {
-        System.out.println("Select a parameter to search by:");
-        System.out.println("1 - id, 2 - district, 3 - address, 4 - roomNum, 5 - square, 6 - price.");
-        System.out.print("Your choice: ");
-        String s = scanner.nextLine();
-
+    private static void FindFlatsById(int id) throws SQLException {
         try {
-            PreparedStatement ps = conn.prepareStatement("SELECT * FROM Flats " +
-                    "WHERE id = ? or district = ? or address = ? or roomNum = ? or square = ? or price = ?");
-            try {
-                switch (s) {
-                    case "1":
-                        System.out.print("Enter id: ");
-                        String sid = scanner.nextLine();
-                        int id = Integer.parseInt(sid);
-                        ps.setInt(1, id);
-                        break;
-                    case "2":
-                        System.out.print("Enter district: ");
-                        String district = scanner.nextLine();
-                        ps.setString(2, district);
-                        break;
-                    case "3":
-                        System.out.print("Enter address: ");
-                        String address = scanner.nextLine();
-                        ps.setString(3, address);
-                        break;
-                    case "4":
-                        System.out.print("Enter number of rooms: ");
-                        String sroomNum = scanner.nextLine();
-                        int roomNum = Integer.parseInt(sroomNum);
-                        ps.setInt(4, roomNum);
-                        break;
-                    case "5":
-                        System.out.print("Enter square: ");
-                        String ssquare = scanner.nextLine();
-                        float square = Float.parseFloat(ssquare);
-                        ps.setFloat(5, square);
-                        break;
-                    case "6":
-                        System.out.print("Enter price: ");
-                        String sprice = scanner.nextLine();
-                        int price = Integer.parseInt(sprice);
-                        ps.setInt(6, price);
-                        break;
-                    default:
-//                    break;
-                        return;
+            try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM Flats WHERE id = ?")){
+                ps.setInt(1, id);
+                ResultSet rs = ps.executeQuery();
+                try {
+                    ResultSetMetaData md = rs.getMetaData();
+                    System.out.println(" ---------------------------------------------------------------------");
+                    for (int i = 1; i <= md.getColumnCount(); i++)
+                        System.out.print(" | " + md.getColumnName(i) + "\t");
+                    System.out.println(" | ");
+                    System.out.println(" ---------------------------------------------------------------------");
+                    while (rs.next()) {
+                        for (int i = 1; i <= md.getColumnCount(); i++) {
+                            System.out.print(" | " + rs.getString(i) + "\t");
+                        }
+                        System.out.println(" | ");
+                        System.out.println(" ---------------------------------------------------------------------");
+                    }
+                } finally {
+                    rs.close();
                 }
+            }
+        }catch (Exception ex) {
+            System.out.println(ex);
+        }
+    }
+    private static void FindFlatsByDistrict(String district) throws SQLException {
+        try {
+            try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM Flats WHERE district = ?")){
+                ps.setString(1, district);
                 ResultSet rs = ps.executeQuery();
 
                 try {
@@ -182,8 +205,118 @@ public class Main {
                 } finally {
                     rs.close();
                 }
-            } finally {
-                ps.close();
+            }
+        }catch (Exception ex) {
+            System.out.println(ex);
+        }
+    }
+    private static void FindFlatsByAddress(String address) throws SQLException {
+        try {
+            try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM Flats WHERE address = ?")) {
+                ps.setString(1, address);
+                ResultSet rs = ps.executeQuery();
+
+                try {
+                    ResultSetMetaData md = rs.getMetaData();
+                    System.out.println(" ---------------------------------------------------------------------");
+                    for (int i = 1; i <= md.getColumnCount(); i++)
+                        System.out.print(" | " + md.getColumnName(i) + "\t");
+                    System.out.println(" | ");
+                    System.out.println(" ---------------------------------------------------------------------");
+                    while (rs.next()) {
+                        for (int i = 1; i <= md.getColumnCount(); i++) {
+                            System.out.print(" | " + rs.getString(i) + "\t");
+                        }
+                        System.out.println(" | ");
+                        System.out.println(" ---------------------------------------------------------------------");
+                    }
+                } finally {
+                    rs.close();
+                }
+            }
+        }catch (Exception ex) {
+            System.out.println(ex);
+        }
+    }
+    private static void FindFlatsByRoom(int roomNum) throws SQLException {
+        try {
+            try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM Flats roomNum = ?")){
+                ps.setInt(1, roomNum);
+                ResultSet rs = ps.executeQuery();
+
+                try {
+                    ResultSetMetaData md = rs.getMetaData();
+                    System.out.println(" ---------------------------------------------------------------------");
+                    for (int i = 1; i <= md.getColumnCount(); i++)
+                        System.out.print(" | " + md.getColumnName(i) + "\t");
+                    System.out.println(" | ");
+                    System.out.println(" ---------------------------------------------------------------------");
+                    while (rs.next()) {
+                        for (int i = 1; i <= md.getColumnCount(); i++) {
+                            System.out.print(" | " + rs.getString(i) + "\t");
+                        }
+                        System.out.println(" | ");
+                        System.out.println(" ---------------------------------------------------------------------");
+                    }
+                } finally {
+                    rs.close();
+                }
+            }
+        }catch (Exception ex) {
+            System.out.println(ex);
+        }
+    }
+    private static void FindFlatsBySquare(float square) throws SQLException {
+        try {
+            try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM Flats WHERE square = ?")) {
+                ps.setFloat(1, square);
+                ResultSet rs = ps.executeQuery();
+
+                try {
+                    ResultSetMetaData md = rs.getMetaData();
+                    System.out.println(" ---------------------------------------------------------------------");
+                    for (int i = 1; i <= md.getColumnCount(); i++)
+                        System.out.print(" | " + md.getColumnName(i) + "\t");
+                    System.out.println(" | ");
+                    System.out.println(" ---------------------------------------------------------------------");
+                    while (rs.next()) {
+                        for (int i = 1; i <= md.getColumnCount(); i++) {
+                            System.out.print(" | " + rs.getString(i) + "\t");
+                        }
+                        System.out.println(" | ");
+                        System.out.println(" ---------------------------------------------------------------------");
+                    }
+                } finally {
+                    rs.close();
+                }
+            }
+        }catch (Exception ex) {
+            System.out.println(ex);
+        }
+    }
+    private static void FindFlatsByPrice(int price) throws SQLException {
+        try {
+            try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM Flats WHERE price = ?")) {
+                ps.setInt(1, price);
+                ResultSet rs = ps.executeQuery();
+
+                try {
+                    ResultSetMetaData md = rs.getMetaData();
+                    System.out.println(" ---------------------------------------------------------------------");
+                    for (int i = 1; i <= md.getColumnCount(); i++)
+                        System.out.print(" | " + md.getColumnName(i) + "\t");
+                    System.out.println(" | ");
+                    System.out.println(" ---------------------------------------------------------------------");
+                    while (rs.next()) {
+                        for (int i = 1; i <= md.getColumnCount(); i++) {
+                            System.out.print(" | " + rs.getString(i) + "\t");
+                        }
+                        System.out.println(" | ");
+                        System.out.println(" ---------------------------------------------------------------------");
+                    }
+                } finally {
+                    rs.close();
+                }
             }
         }catch (Exception ex) {
             System.out.println(ex);
